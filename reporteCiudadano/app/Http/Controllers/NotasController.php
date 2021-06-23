@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Notas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotasController extends Controller
 {
@@ -33,9 +34,19 @@ class NotasController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
         //
+        ;
+        $nota = new Notas();
+        $nota->asunto = $request->asunto;
+        $nota->comentario = $request->comentario;
+        $nota->id_reporte = $id;
+        $nota->id_usuario = Auth::user()->id;
+
+        $nota->save();
+
+        return redirect('/reportes/'.$id);
     }
 
     /**
@@ -78,8 +89,12 @@ class NotasController extends Controller
      * @param  \App\Models\Notas  $notas
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Notas $notas)
+    public function destroy($id)
     {
         //
+        $notas = Notas::findOrFail($id);
+        $id_reporte = $notas->id_reporte;
+        $notas->delete();
+        return redirect('/reportes/'.$id_reporte);
     }
 }
